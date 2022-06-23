@@ -162,10 +162,10 @@ func (d *Dialer) DialContext(ctx context.Context, urlStr string, requestHeader h
 		d = &nilDialer
 	}
 
-	challengeKey, err := generateChallengeKey()
-	if err != nil {
-		return nil, nil, err
-	}
+	// challengeKey, err := generateChallengeKey()
+	// if err != nil {
+	// 	return nil, nil, err
+	// }
 
 	u, err := url.Parse(urlStr)
 	if err != nil {
@@ -397,8 +397,7 @@ func (d *Dialer) DialContext(ctx context.Context, urlStr string, requestHeader h
 
 	if resp.StatusCode != 101 ||
 		!tokenListContainsValue(resp.Header, "Upgrade", "websocket") ||
-		!tokenListContainsValue(resp.Header, "Connection", "upgrade") ||
-		resp.Header.Get("Sec-Websocket-Accept") != computeAcceptKey(challengeKey) {
+		!tokenListContainsValue(resp.Header, "Connection", "upgrade") {
 		// Before closing the network connection on return from this
 		// function, slurp up some of the response to aid application
 		// debugging.
