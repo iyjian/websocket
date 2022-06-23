@@ -216,28 +216,32 @@ func (d *Dialer) DialContext(ctx context.Context, urlStr string, requestHeader h
 		req.Header["Sec-WebSocket-Protocol"] = []string{strings.Join(d.Subprotocols, ", ")}
 	}
 	for k, vs := range requestHeader {
-		switch {
-		case k == "Host":
-			if len(vs) > 0 {
-				req.Host = vs[0]
-			}
-		case k == "Upgrade" ||
-			k == "Connection" ||
-			k == "Sec-Websocket-Key" ||
-			k == "Sec-Websocket-Version" ||
-			k == "Sec-Websocket-Extensions" ||
-			(k == "Sec-Websocket-Protocol" && len(d.Subprotocols) > 0):
-			return nil, nil, errors.New("websocket: duplicate header not allowed: " + k)
-		case k == "Sec-Websocket-Protocol":
-			req.Header["Sec-WebSocket-Protocol"] = vs
-		default:
-			req.Header[k] = vs
+		// switch {
+		// case k == "Host":
+		// 	if len(vs) > 0 {
+		// 		req.Host = vs[0]
+		// 	}
+		// case k == "Upgrade" ||
+		// 	k == "Connection" ||
+		// 	k == "Sec-Websocket-Key" ||
+		// 	k == "Sec-Websocket-Version" ||
+		// 	k == "Sec-Websocket-Extensions" ||
+		// 	(k == "Sec-Websocket-Protocol" && len(d.Subprotocols) > 0):
+		// 	return nil, nil, errors.New("websocket: duplicate header not allowed: " + k)
+		// case k == "Sec-Websocket-Protocol":
+		// 	req.Header["Sec-WebSocket-Protocol"] = vs
+		// default:
+		// 	req.Header[k] = vs
+		// }
+		if k == "Sec-WebSocket-Extensions" {
+			d.EnableCompression = true
 		}
+		req.Header[k] = vs
 	}
 
-	if d.EnableCompression {
-		req.Header["Sec-WebSocket-Extensions"] = []string{"permessage-deflate; server_no_context_takeover; client_no_context_takeover"}
-	}
+	// if d.EnableCompression {
+	// 	req.Header["Sec-WebSocket-Extensions"] = []string{"permessage-deflate; server_no_context_takeover; client_no_context_takeover"}
+	// }
 
 	if d.HandshakeTimeout != 0 {
 		var cancel func()
