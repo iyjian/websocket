@@ -401,6 +401,9 @@ func (d *Dialer) DialContext(ctx context.Context, urlStr string, requestHeader h
 		// Before closing the network connection on return from this
 		// function, slurp up some of the response to aid application
 		// debugging.
+		for k, vv := range resp.Header {
+			fmt.Println(k, vv, resp.StatusCode)
+		}
 		buf := make([]byte, 1024)
 		n, _ := io.ReadFull(resp.Body, buf)
 		resp.Body = ioutil.NopCloser(bytes.NewReader(buf[:n]))
