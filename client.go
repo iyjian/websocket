@@ -395,15 +395,16 @@ func (d *Dialer) DialContext(ctx context.Context, urlStr string, requestHeader h
 		}
 	}
 
+	for k, vv := range resp.Header {
+		fmt.Println("client.go: ", k, vv, resp.StatusCode)
+	}
+
 	if resp.StatusCode != 101 ||
 		!tokenListContainsValue(resp.Header, "Upgrade", "websocket") ||
 		!tokenListContainsValue(resp.Header, "Connection", "upgrade") {
 		// Before closing the network connection on return from this
 		// function, slurp up some of the response to aid application
 		// debugging.
-		for k, vv := range resp.Header {
-			fmt.Println(k, vv, resp.StatusCode)
-		}
 		buf := make([]byte, 1024)
 		n, _ := io.ReadFull(resp.Body, buf)
 		resp.Body = ioutil.NopCloser(bytes.NewReader(buf[:n]))
@@ -414,11 +415,11 @@ func (d *Dialer) DialContext(ctx context.Context, urlStr string, requestHeader h
 		if ext[""] != "permessage-deflate" {
 			continue
 		}
-		_, snct := ext["server_no_context_takeover"]
-		_, cnct := ext["client_no_context_takeover"]
-		if !snct || !cnct {
-			return nil, resp, errInvalidCompression
-		}
+		// _, snct := ext["server_no_context_takeover"]
+		// _, cnct := ext["client_no_context_takeover"]
+		// if !snct || !cnct {
+		// 	return nil, resp, errInvalidCompression
+		// }
 		conn.newCompressionWriter = compressNoContextTakeover
 		conn.newDecompressionReader = decompressNoContextTakeover
 		break
